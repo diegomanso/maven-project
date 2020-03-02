@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+
+    parameters {
+         string(name: 'tomcat_dev', defaultValue: '35.166.210.154', description: 'Staging Server')
+         string(name: 'tomcat_prod', defaultValue: '34.209.233.6', description: 'Production Server')
+    }
+
+    triggers {
+         pollSCM('* * * * *')
+     }
+
+stages{
+        stage('Build'){
+            steps {
+                 sh '''
+                    PATH=$PATH:/usr/local/Cellar/maven/3.6.3_1/bin
+                    mvn --version
+                    mvn clean package
+                '''
+            }
+            post {
+                success {
+                    echo 'Now Archiving...'
+                    archiveArtifacts artifacts: '**/target/*.war'
+                }
+            }
+        }
+
+        stage ('Deployments'){
+            parallel{
+                stage ('Deploy to Staging'){
+                    steps {
+                        // "scp -i /home/jenkins/tomcat-demo.pem **/target/*.war ec2-user@${params.tomcat_dev}:/var/lib/tomcat7/webapps"
+                        sh "cp /home/jenkins/tomcat-demo.pem **/target/*.war /usr/local/Cellar/tomcat/9.0.31_1/libexec/webapps/"
+                    }
+                }
+
+                stage ("Deploy to Production"){
+                    steps {
+                        // sh "scp -i /home/jenkins/tomcat-demo.pem **/target/*.war ec2-user@${params.tomcat_prod}:/var/lib/tomcat7/webapps"
+                        sh "cp /home/jenkins/tomcat-demo.pem **/target/*.war /usr/local/Cellar/tomcat2/9.0.31_1/libexec/webapps/"
+                    }
+                }
+            }
+        }
+    }
+}
