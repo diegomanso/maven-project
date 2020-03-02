@@ -6,7 +6,7 @@ pipeline {
                 sh '''
                     PATH=$PATH:/usr/local/Cellar/maven/3.6.3_1/bin
                     mvn --version
-                    mvn clean package'
+                    mvn clean package
                 '''
             }
             post {
