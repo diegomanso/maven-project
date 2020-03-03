@@ -7,6 +7,7 @@ pipeline {
                     PATH=$PATH:/usr/local/Cellar/maven/3.6.3_1/bin
                     mvn clean package
                 '''
+                sh "pwd && ls -l"
                 sh "/usr/local/bin/docker build . -t tomcatwebapp:${env.BUILD_ID}"
             }
         }
