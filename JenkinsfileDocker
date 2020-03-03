@@ -4,7 +4,7 @@ pipeline {
         stage('Build'){
             steps{
                 sh '''
-                    PATH=$PATH:/usr/local/Cellar/maven/3.6.3_1/bin
+                    PATH=$PATH:/usr/local/Cellar/maven/3.6.3_1/bin:/usr/local/bin/
                     mvn clean package
                 '''
                 sh "docker build . -t tomcatwebapp:${env.BUILD_ID}"
